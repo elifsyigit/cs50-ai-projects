@@ -58,7 +58,37 @@ def load_data(data_dir):
     be a list of integer labels, representing the categories for each of the
     corresponding `images`.
     """
-    raise NotImplementedError
+
+    # until nothing left,go through the i th subfolder and label it as i 
+    # i++ and repeat the same process
+    images = []
+    labels = []
+
+    for category in range(NUM_CATEGORIES):
+        folder_path = os.path.join(data_dir, str(category))
+
+        if not os.path.isdir(folder_path):
+            continue
+
+        for filename in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, filename)
+
+            try:
+                img = cv2.imread(file_path)
+                if img is None:
+                    raise ValueError("Could not read image.")
+
+                img = cv2.resize(img, (IMG_WIDTH, IMG_HEIGHT))
+
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+                images.append(img)
+                labels.append(int(category))
+
+            except Exception as e:
+                print(f"Failed to load {file_path}: {e}")
+
+    return images, labels 
 
 
 def get_model():
@@ -67,7 +97,26 @@ def get_model():
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
-    raise NotImplementedError
+    model = tf.keras.models.Sequential()
+
+    model.add(tf.keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=(30, 30, 3)))
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+
+
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation="relu"))
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(tf.keras.layers.Flatten())
+
+    model.add(tf.keras.layers.Dense(128, activation="relu"))
+
+    model.add(tf.keras.layers.Dropout(0.3))
+
+    model.add(tf.keras.layers.Dense(43, activation="softmax"))
+
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+    return model
 
 
 if __name__ == "__main__":
