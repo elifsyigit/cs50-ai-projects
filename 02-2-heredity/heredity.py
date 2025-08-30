@@ -3,48 +3,39 @@ import itertools
 import sys
 
 PROBS = {
-
-    # Unconditional probabilities for having gene
     "gene": {
         2: 0.01,
         1: 0.03,
         0: 0.96
     },
-
     "trait": {
 
-        # Probability of trait given two copies of gene
         2: {
             True: 0.65,
             False: 0.35
         },
 
-        # Probability of trait given one copy of gene
         1: {
             True: 0.56,
             False: 0.44
         },
 
-        # Probability of trait given no gene
         0: {
             True: 0.01,
             False: 0.99
         }
     },
 
-    # Mutation probability
     "mutation": 0.01
 }
 
 
 def main():
 
-    # Check for proper usage
     if len(sys.argv) != 2:
         sys.exit("Usage: python heredity.py data.csv")
     people = load_data(sys.argv[1])
 
-    # Keep track of gene and trait probabilities for each person
     probabilities = {
         person: {
             "gene": {
@@ -60,11 +51,9 @@ def main():
         for person in people
     }
 
-    # Loop over all sets of people who might have the trait
     names = set(people)
     for have_trait in powerset(names):
 
-        # Check if current set of people violates known information
         fails_evidence = any(
             (people[person]["trait"] is not None and
              people[person]["trait"] != (person in have_trait))
@@ -73,18 +62,14 @@ def main():
         if fails_evidence:
             continue
 
-        # Loop over all sets of people who might have the gene
         for one_gene in powerset(names):
             for two_genes in powerset(names - one_gene):
 
-                # Update probabilities with new joint probability
                 p = joint_probability(people, one_gene, two_genes, have_trait)
                 update(probabilities, one_gene, two_genes, have_trait, p)
 
-    # Ensure probabilities sum to 1
     normalize(probabilities)
 
-    # Print results
     for person in people:
         print(f"{person}:")
         for field in probabilities[person]:
@@ -149,15 +134,11 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         else:
             genes = 0
 
-        # Determine if the person has the trait
         has_trait = person in have_trait
 
-        # Compute probability of this gene count
         if people[person]["mother"] is None:
-            # No parents → use unconditional probabilities
             gene_prob = PROBS["gene"][genes]
         else:
-            # Compute inheritance probability from parents
             mother = people[person]["mother"]
             father = people[person]["father"]
 
@@ -166,14 +147,13 @@ def joint_probability(people, one_gene, two_genes, have_trait):
                 if parent in two_genes:
                     return 1 - PROBS["mutation"]  # Always passes gene unless mutation
                 elif parent in one_gene:
-                    return 0.5  # 50% chance
+                    return 0.5  
                 else:
-                    return PROBS["mutation"]  # Only via mutation
+                    return PROBS["mutation"] 
 
             mother_prob = parent_gene_prob(mother)
             father_prob = parent_gene_prob(father)
 
-            # Compute child's probability of getting `genes` copies
             if genes == 2:
                 gene_prob = mother_prob * father_prob
             elif genes == 1:
@@ -181,10 +161,8 @@ def joint_probability(people, one_gene, two_genes, have_trait):
             else:
                 gene_prob = (1 - mother_prob) * (1 - father_prob)
 
-        # Compute probability of trait given gene count
         trait_prob = PROBS["trait"][genes][has_trait]
 
-        # Multiply joint probability
         probability *= gene_prob * trait_prob
 
     return probability
