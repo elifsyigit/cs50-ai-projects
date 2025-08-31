@@ -1,18 +1,18 @@
 # Analysis
 
-## Layer TODO, Head TODO
+## Layer 7, Head 4
 
-TODO
-
-Example Sentences:
-- TODO
-- TODO
-
-## Layer TODO, Head TODO
-
-TODO
+In the attention visualizations, I observed that verbs consistently attend to their direct objects when predicting the masked tokens.
 
 Example Sentences:
-- TODO
-- TODO
+- Mom prepared the [MASK] before the guests arrived.
+- The student solved the [MASK] before sunrise.
+
+## Layer 6, Head 7
+
+In the attention visualizations, I observed that verbs like tell and ask attend strongly to the “to-infinitive” part of the construction.
+
+Example Sentences:
+- [MASK] would like to sit down and make up. 
+- I will go out [MASK] she tells me to.
 

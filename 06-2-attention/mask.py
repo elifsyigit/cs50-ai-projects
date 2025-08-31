@@ -140,4 +140,3 @@ def generate_diagram(layer_number, head_number, tokens, attention_weights):
 if __name__ == "__main__":
     main()
 
-    #layer4 10,7 6
